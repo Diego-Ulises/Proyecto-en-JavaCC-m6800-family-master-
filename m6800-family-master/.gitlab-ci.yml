@@ -1,0 +1,26 @@
+stages:
+  - build
+  - release
+
+build:
+  stage: build
+  image: openjdk:8
+  script:
+    - mkdir -p bin
+    - javac -d bin $(find ./src -name *.java)
+    - cd bin/ && jar cfe ../M6800.jar com.mvochoa.m6800.Main * && cd ..
+  artifacts:
+    paths:
+      - M6800.jar
+  only:
+   - tags
+
+release:
+  stage: release
+  image: alpine:3.8
+  before_script:
+    - apk add --update curl git bash
+  script:
+    - ./changelog.sh
+  only:
+   - tags
